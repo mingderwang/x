@@ -1,26 +1,33 @@
 console.log("Hello via Bun!");
-import inquirer from "inquirer";
+console.log(process.env.PRIVATE_KEY);
 
-async function selectFromList(options: string[]): Promise<string> {
-  const questions = [
-    {
-      type: "list",
-      name: "selectedOption",
-      message: "Select an option:",
-      choices: options,
-    },
-  ];
+import { IBundler, Bundler } from '@biconomy/bundler'
+import { ethers } from 'ethers'
+import { ChainId } from "@biconomy/core-types"
+import {  BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from "@biconomy/account"
 
-  const answers = await inquirer.prompt(questions);
-  return answers.selectedOption;
+async function getProvider() {
+  try {
+    // Specify the network (Mumbai testnet)
+    const provider = ethers.getDefaultProvider("maticMumbai");
+
+    // Get the network information
+    const network = await provider.getNetwork();
+    console.log('Connected to network:', network.name);
+
+    // Get the block number
+    const blockNumber = await provider.getBlockNumber();
+    console.log('Latest block number:', blockNumber);
+  } catch (error) {
+    console.error('Error:', error);
+  }
 }
 
-async function main() {
-  const options = ['Option1', 'Option2', 'Option3'];
-  const selectedOption = await selectFromList(options);
+const provider = getProviderExample();
+const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || "");
 
-  console.log(`You selected: ${selectedOption}`);
-}
-
-main();
-
+const bundler: IBundler = new Bundler({
+  bundlerUrl: 'https://bundler.biconomy.io/api/v2/80001/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44',     
+  chainId: ChainId.POLYGON_MUMBAI,
+  entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+})
